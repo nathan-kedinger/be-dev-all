@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Mission;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 
 /**
@@ -87,9 +88,9 @@ class MissionRepository extends ServiceEntityRepository
     /**
      * @param int $page
      * @param int $itemsPerPage
-     * @return \Knp\Component\Pager\Pagination\PaginationInterface
+     * @return PaginationInterface
      */
-    public function findPaginatedMissions(int $page = 1, int $itemsPerPage = 10)
+    public function findPaginatedMissions(int $page = 1, int $itemsPerPage = 10): PaginationInterface
     {
         $queryBuilder = $this->createQueryBuilder('m')
             ->orderBy('m.createdAt', 'DESC');
