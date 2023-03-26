@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Mission;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * @extends ServiceEntityRepository<Mission>
@@ -16,9 +17,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class MissionRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, PaginatorInterface $paginator)
     {
         parent::__construct($registry, Mission::class);
+        $this->paginator = $paginator;
     }
 
     public function save(Mission $entity, bool $flush = false): void
@@ -41,7 +43,7 @@ class MissionRepository extends ServiceEntityRepository
 
     /**
      * @param int $limit
-     * @return float|int|mixed|string
+     * @return int
      */
     public function findLatest(int $limit = 10)
     {
@@ -80,6 +82,23 @@ class MissionRepository extends ServiceEntityRepository
         // Ajoutez des conditions supplémentaires en fonction des filtres souhaités
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param int $page
+     * @param int $itemsPerPage
+     * @return \Knp\Component\Pager\Pagination\PaginationInterface
+     */
+    public function findPaginatedMissions(int $page = 1, int $itemsPerPage = 10)
+    {
+        $queryBuilder = $this->createQueryBuilder('m')
+            ->orderBy('m.createdAt', 'DESC');
+
+        return $this->paginator->paginate(
+            $queryBuilder,
+            $page,
+            $itemsPerPage
+        );
     }
 
 //    /**

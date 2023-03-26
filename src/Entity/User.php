@@ -38,17 +38,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'users', targetEntity: Mission::class)]
     private Collection $missions;
 
-    #[ORM\OneToMany(mappedBy: 'sender', targetEntity: Message::class)]
-    private Collection $sentMessage;
+    #[ORM\ManyToMany(targetEntity: Conversation::class, inversedBy: 'participants')]
+    private Collection $conversation;
 
-    #[ORM\OneToMany(mappedBy: 'recipient', targetEntity: Message::class)]
-    private Collection $receivedMessages;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserLanguage::class)]
+    private Collection $userLanguages;
 
     public function __construct()
     {
         $this->missions = new ArrayCollection();
         $this->sentMessage = new ArrayCollection();
         $this->receivedMessages = new ArrayCollection();
+        $this->conversation = new ArrayCollection();
+        $this->userLanguages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -164,62 +166,57 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Message>
+     * @return Collection<int, Conversation>
      */
-    public function getSentMessage(): Collection
+    public function getConversation(): Collection
     {
-        return $this->sentMessage;
+        return $this->conversation;
     }
 
-    public function addSentMessage(Message $sentMessage): self
+    public function addConversation(Conversation $conversation): self
     {
-        if (!$this->sentMessage->contains($sentMessage)) {
-            $this->sentMessage->add($sentMessage);
-            $sentMessage->setSender($this);
+        if (!$this->conversation->contains($conversation)) {
+            $this->conversation->add($conversation);
         }
 
         return $this;
     }
 
-    public function removeSentMessage(Message $sentMessage): self
+    public function removeConversation(Conversation $conversation): self
     {
-        if ($this->sentMessage->removeElement($sentMessage)) {
-            // set the owning side to null (unless already changed)
-            if ($sentMessage->getSender() === $this) {
-                $sentMessage->setSender(null);
-            }
-        }
+        $this->conversation->removeElement($conversation);
 
         return $this;
     }
 
     /**
-     * @return Collection<int, Message>
+     * @return Collection<int, UserLanguage>
      */
-    public function getReceivedMessages(): Collection
+    public function getUserLanguages(): Collection
     {
-        return $this->receivedMessages;
+        return $this->userLanguages;
     }
 
-    public function addReceivedMessage(Message $receivedMessage): self
+    public function addUserLanguage(UserLanguage $userLanguage): self
     {
-        if (!$this->receivedMessages->contains($receivedMessage)) {
-            $this->receivedMessages->add($receivedMessage);
-            $receivedMessage->setRecipient($this);
+        if (!$this->userLanguages->contains($userLanguage)) {
+            $this->userLanguages->add($userLanguage);
+            $userLanguage->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeReceivedMessage(Message $receivedMessage): self
+    public function removeUserLanguage(UserLanguage $userLanguage): self
     {
-        if ($this->receivedMessages->removeElement($receivedMessage)) {
+        if ($this->userLanguages->removeElement($userLanguage)) {
             // set the owning side to null (unless already changed)
-            if ($receivedMessage->getRecipient() === $this) {
-                $receivedMessage->setRecipient(null);
+            if ($userLanguage->getUser() === $this) {
+                $userLanguage->setUser(null);
             }
         }
 
         return $this;
     }
+
 }
