@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MissionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -28,6 +30,14 @@ class Mission
 
     #[ORM\ManyToOne(inversedBy: 'missions')]
     private ?User $users = null;
+
+    #[ORM\ManyToMany(targetEntity: Languages::class, inversedBy: 'missions')]
+    private Collection $languages;
+
+    public function __construct()
+    {
+        $this->languages = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -90,6 +100,30 @@ class Mission
     public function setUsers(?User $users): self
     {
         $this->users = $users;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Languages>
+     */
+    public function getLanguages(): Collection
+    {
+        return $this->languages;
+    }
+
+    public function addLanguage(Languages $language): self
+    {
+        if (!$this->languages->contains($language)) {
+            $this->languages->add($language);
+        }
+
+        return $this;
+    }
+
+    public function removeLanguage(Languages $language): self
+    {
+        $this->languages->removeElement($language);
 
         return $this;
     }

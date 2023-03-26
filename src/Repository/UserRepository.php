@@ -65,11 +65,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * @param array $filters
      * @return array
      */
-    public function searchUsers(string $searchTerm, array $filters = []): array
+    public function searchUsers(string $searchTerm, int $page = 1, int $itemsPerPage = 10, array $filters = []): array
     {
-        $queryBuilder = $this->createQueryBuilder('p')
-            ->where('p.username LIKE :searchTerm OR p.fullName LIKE :searchTerm')
-            ->setParameter('searchTerm', '%' . $searchTerm . '%');
+        $queryBuilder = $this->createQueryBuilder('p');
+
+        if (!empty($searchTerm)) {
+            $queryBuilder
+                ->where('p.username LIKE :searchTerm OR p.fullName LIKE :searchTerm')
+                ->setParameter('searchTerm', '%' . $searchTerm . '%');
+    }
 
         if (!empty($filters['skills'])) {
             $queryBuilder
@@ -84,20 +88,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         }
 
         // Adding other conditions
+
+        // Set the pagination
+        $queryBuilder->setFirstResult(($page - 1) * $itemsPerPage)
+            ->setMaxResults($itemsPerPage);
+
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function findPaginatedUsers(int $page = 1, int $itemsPerPage = 10)
-    {
-        $queryBuilder = $this->createQueryBuilder('u')
-            ->orderBy('u.createdAt', 'DESC');
-
-        return $this->paginator->paginate(
-            $queryBuilder,
-            $page,
-            $itemsPerPage
-        );
-    }
 
 //    /**
 //     * @return User[] Returns an array of User objects

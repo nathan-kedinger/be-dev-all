@@ -11,7 +11,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class MissionController extends AbstractController
 {
@@ -43,14 +42,6 @@ class MissionController extends AbstractController
         return $this->render('mission/new.html.twig', [
             'mission' => $mission,
             'form' => $form->createView(),
-        ]);
-    }
-
-    #[Route('/mission/{id}', name: 'app_mission_show', methods: "GET")]
-    public function show(Mission $mission): Response
-    {
-        return $this->render('mission/show.html.twig', [
-            'mission' => $mission,
         ]);
     }
 }

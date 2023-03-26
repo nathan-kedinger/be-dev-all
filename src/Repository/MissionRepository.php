@@ -62,25 +62,29 @@ class MissionRepository extends ServiceEntityRepository
      * @param array $filters
      * @return array
      */
-    public function searchMissions(string $searchTerm, array $filters = []): array
+    public function searchMissions(string $searchTerm, array $selectedLanguages, int $page = 1, int $itemsPerPage = 10): array
     {
-        $queryBuilder = $this->createQueryBuilder('m')
-            ->where('m.title LIKE :searchTerm OR m.description LIKE :searchTerm')
-            ->setParameter('searchTerm', '%' . $searchTerm . '%');
+        $queryBuilder = $this->createQueryBuilder('m');
 
-        if (!empty($filters['language'])) {
+        if(!empty($searchTerm)){
             $queryBuilder
-                ->andWhere('m.language = :language')
-                ->setParameter('language', $filters['language']);
+                ->where('m.title LIKE :searchTerm OR m.description LIKE :searchTerm')
+                ->setParameter('searchTerm', '%' . $searchTerm . '%');
         }
 
-        if (!empty($filters['startDate'])) {
+
+        if (!empty($selectedLanguages)) {
             $queryBuilder
-                ->andWhere('m.startDate >= :startDate')
-                ->setParameter('startDate', $filters['startDate']);
+                ->innerJoin('m.languages', 'l')
+                ->andWhere('l IN (:selectedLanguages)')
+                ->setParameter('selectedLanguages', $selectedLanguages);
         }
 
         // Ajoutez des conditions supplémentaires en fonction des filtres souhaités
+
+        // Set the pagination
+        $queryBuilder->setFirstResult(($page - 1) * $itemsPerPage)
+            ->setMaxResults($itemsPerPage);
 
         return $queryBuilder->getQuery()->getResult();
     }
