@@ -34,6 +34,9 @@ class Mission
     #[ORM\ManyToMany(targetEntity: Languages::class, inversedBy: 'missions')]
     private Collection $languages;
 
+    #[ORM\Column]
+    private ?bool $visible = null;
+
     public function __construct()
     {
         $this->languages = new ArrayCollection();
@@ -124,6 +127,18 @@ class Mission
     public function removeLanguage(Languages $language): self
     {
         $this->languages->removeElement($language);
+
+        return $this;
+    }
+
+    public function isVisible(): ?bool
+    {
+        return $this->visible;
+    }
+
+    public function setVisible(bool $visible): self
+    {
+        $this->visible = $visible;
 
         return $this;
     }

@@ -29,7 +29,7 @@ class HomeController extends AbstractController
             'language' => $request->query->get('language', ''),
         ];
         $missions = $missionViewModel->searchMissions($request, $selectedLanguages, $page, $itemsPerPage, $em);
-        dump($missions);
+        //dump($missions);
 
         return $this->render('home/index.html.twig', [
             'missions' => $missions,

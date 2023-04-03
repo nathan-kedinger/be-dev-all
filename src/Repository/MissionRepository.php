@@ -59,7 +59,9 @@ class MissionRepository extends ServiceEntityRepository
      * Allow to research into users by filters and therms
      *
      * @param string $searchTerm
-     * @param array $filters
+     * @param array $selectedLanguages
+     * @param int $page
+     * @param int $itemsPerPage
      * @return array
      */
     public function searchMissions(string $searchTerm, array $selectedLanguages, int $page = 1, int $itemsPerPage = 10): array
